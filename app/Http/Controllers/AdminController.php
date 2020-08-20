@@ -108,8 +108,8 @@ class AdminController extends Controller
                             $prenom = $row[1];
                             $naissance = $row[2];
                             $email = $row[3];
-                            $isAdmin = $row[4];
-                            $isTeacher = $row[5];
+                            $isTeacher = $row[4];
+                            $isAdmin = $row[5];
 
                             if (empty($nom)) {
                                 $request->session()->flash('danger', 'Le nom est manquant pour la ligne ' . $i);
@@ -150,7 +150,7 @@ class AdminController extends Controller
                             $user->is_teacher = $isTeacher == '' ? false : $isTeacher;
 
                             $user->save();
-                            $request->session()->flash('succes', 'Le compte ' . $i . ' a été créé avec succès.');
+                            $request->session()->flash('success', 'Le compte ' . $i . ' a été créé avec succès.');
                             $i++;
                         }
                     }

@@ -8,11 +8,6 @@
                 <div class="card-header">{{ __('Créer un compte') }}</div>
 
                 <div class="card-body">
-                    @foreach (['danger', 'warning', 'success', 'info'] as $key)
-                        @if(Session::has($key))
-                            <p class="alert alert-{{ $key }}">{{ Session::get($key) }}</p>
-                        @endif
-                    @endforeach
                     <form method="post" action="{{ route('update_password') }}">
                     @csrf
                         <div class="form-group">

@@ -28,3 +28,6 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function() {
 
 Route::get('home', 'HomeController@index')->name('home');
 Route::match(['get', 'post'], 'update-password', 'UserController@updatePassword')->name('update_password');
+Route::match(['get', 'post'], 'load-homework', 'UserController@loadFile')->name('load_homework');
+Route::match(['get', 'post'], 'homeworks', 'UserController@getHomeworks')->name('get_homeworks');
+Route::match(['get', 'post'], 'download-file/{id}', 'UserController@downloadFile')->name('download_file');

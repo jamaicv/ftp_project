@@ -18,12 +18,14 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/all.min.css') }}" rel="stylesheet">
 </head>
 <body>
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
+            <img href="{{ asset('img/logo.png') }}" />
+                <a class="navbar-brand" href="{{ url('/home') }}">
                     {{ config('app.name', 'Laravel') }}
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
@@ -75,7 +77,7 @@
         <main class="py-4">
             @foreach (['danger', 'warning', 'success', 'info'] as $key)
                 @if(Session::has($key))
-                    <p class="alert alert-{{ $key }}">{{ Session::get($key) }}</p>
+                    <p class="alert alert-{{ $key }}" style="width: 95%; margin: 0 auto; margin-bottom: 20px;">{{ Session::get($key) }}</p>
                 @endif
             @endforeach
             @yield('content')

@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use League\Flysystem\Sftp\SftpAdapter;
+use League\Flysystem\Filesystem;
+use App\Homework;
 
 class UserController extends Controller
 {
@@ -52,10 +56,62 @@ class UserController extends Controller
     }
 
     public function loadFile(Request $request) {
-        return view('user.load_file');
+        $user = Auth::user();
+        if ($request->isMethod('post')) { 
+            $file = $request->file('file');
+            $filename = $file->getClientOriginalName();
+            $nom_devoir = 'test';
+            $ext = explode('.', $filename)[1];
+
+            $new_filename = strtolower($user->first_name . '_' .$user->last_name . '_' . $nom_devoir . '_' . date('U'));
+
+            ## TODO - VERIFICATIONS
+            $hw = new Homework();
+            $hw->filename = $new_filename;
+            $hw->location = 'public/homeworks';
+            $hw->student_id = $user->id;
+            $hw->save();
+
+
+            $adapter = new SftpAdapter([
+                'host' => '172.27.1.36',
+                'port' => 22,
+                'username' => 'serviej',
+                'password' => 'BelGoss77',
+                'root' => '/',
+                'timeout' => 10,
+                'directoryPerm' => 0755
+            ]);
+
+            $filesystem = new Filesystem($adapter);
+            dd($filesystem);
+            dd($filesystem->put($filename, $file));
+            dd('ok');
+
+            $path = $file->storeAs('public/homeworks', $new_filename);
+            $request->session()->flash('success', 'Le fichier a été chargé avec succès');
+            return redirect()->back();
+        }
+
+        return view('user.load_homework');
     }
 
-    public function downloadFiles() {
+    public function getHomeworks() {
+        $user = Auth::user();
+        $homeworks = array();
+
+        if ($user->isAdmin() || $user->isTeacher()) {
+            $homeworks = Homework::all();
+        } else {
+            $homeworks = Homework::where('student_id', $user->id)->get();
+        }
+
+        return view('user.homeworks', [
+            'homeworks' => $homeworks
+        ]);
+    }
+
+    public function downloadFile() {
         $user = Auth::user();
         if ($user->isAdmin() || $user->isTeacher()) {
             
