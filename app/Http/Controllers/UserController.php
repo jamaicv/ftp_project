@@ -84,7 +84,6 @@ class UserController extends Controller
             ]);
 
             $filesystem = new Filesystem($adapter);
-            dd($filesystem);
             dd($filesystem->put($filename, $file));
             dd('ok');
 
