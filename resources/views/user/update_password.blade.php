@@ -14,7 +14,7 @@
                 </div>
 
                 <div class="card-body">
-                    <form method="post" action="{{ route('update_password') }}">
+                    <form method="post" action="">
                     @csrf
                         @if (!Auth::user()->isAdmin() && $own_pwd)
                         <div class="form-group">

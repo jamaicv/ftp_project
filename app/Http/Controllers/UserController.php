@@ -110,7 +110,8 @@ class UserController extends Controller
             ## TODO - VERIFICATIONS
             $hw = new Homework();
             $hw->filename = $filename;
-            $hw->location = $new_filename;
+            $hw->hashed_name = $new_filename;
+            $hw->location = '/home/' . $login . '/' . $new_filename;
             $hw->correction_location = '';
             $hw->student_id = $user->id;
             $hw->save();
