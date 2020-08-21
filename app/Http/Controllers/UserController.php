@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Sftp\SftpAdapter;
 use League\Flysystem\Filesystem;
 use App\Homework;
+use App\User;
 
 class UserController extends Controller
 {
@@ -31,8 +33,19 @@ class UserController extends Controller
         return view('home');
     }
 
-    public function updatePassword(Request $request) {
+    public function updatePassword(Request $request, $id = null) {
         $user = Auth::user();
+        $own_pwd = true;
+        if (!$user->isAdmin() && $id != $user->id) {
+            $request->session()->flash('danger', 'Vous n \'êtes pas autorisé à réaliser cette action');
+            return redirect()->back();
+        }
+
+        if ($user->isAdmin() && $id != null && $id != $user->id) {
+            $user =  User::find($id);
+            $own_pwd = false;
+        }
+
         if ($request->isMethod('post')) {
             $old_pwd = $request->input('old_password');
             $new_pwd = $request->input('new_password');
@@ -50,9 +63,15 @@ class UserController extends Controller
 
             $user->password = Hash::make($new_pwd);
             $user->save();
+
+            $request->session()->flash('success', 'Le mot de passe a été mis à jour avec succès');
+            return redirect()->route('home');
         }
         
-        return view('user.update_password');
+        return view('user.update_password', [
+            'own_pwd' => $own_pwd,
+            'user_n' => $user->first_name . ' ' . $user->last_name
+        ]);
     }
 
     public function loadFile(Request $request) {
@@ -65,34 +84,62 @@ class UserController extends Controller
 
             $new_filename = strtolower($user->first_name . '_' .$user->last_name . '_' . $nom_devoir . '_' . date('U'));
 
-            ## TODO - VERIFICATIONS
-            $hw = new Homework();
-            $hw->filename = $new_filename;
-            $hw->location = 'public/homeworks';
-            $hw->student_id = $user->id;
-            $hw->save();
-
-
             $adapter = new SftpAdapter([
                 'host' => '172.27.1.36',
                 'port' => 22,
                 'username' => 'serviej',
                 'password' => 'BelGoss77',
-                'root' => '/',
                 'timeout' => 10,
                 'directoryPerm' => 0755
             ]);
-
+            $resource = fopen($file->path(), 'r');
             $filesystem = new Filesystem($adapter);
-            dd($filesystem->put($filename, $file));
-            dd('ok');
+            $filesystem->put($filename, $resource);
 
-            $path = $file->storeAs('public/homeworks', $new_filename);
+            ## TODO - VERIFICATIONS
+            $path = $file->store('public/homeworks');
+
+            $hw = new Homework();
+            $hw->filename = $filename;
+            $hw->location = $filename;
+            $hw->correction_location = '';
+            $hw->student_id = $user->id;
+            $hw->save();
+
             $request->session()->flash('success', 'Le fichier a été chargé avec succès');
             return redirect()->back();
         }
 
         return view('user.load_homework');
+    }
+
+    public function deleteFile(Request $request, $id) {
+        $user = Auth::user();
+        $file = Homework::find($id);
+
+        if (!$user->isAdmin() && $user->id != $file->student_id) {
+            $request->session()->flash('danger', 'Vous n \'êtes pas autorisé à réaliser cette action');
+            return redirect()->back();
+        }
+
+        $adapter = new SftpAdapter([
+            'host' => '172.27.1.36',
+            'port' => 22,
+            'username' => 'serviej',
+            'password' => 'BelGoss77',
+            'timeout' => 10,
+            'directoryPerm' => 0755
+        ]);
+        $filesystem = new Filesystem($adapter);
+
+        // Si le fichier existe, on le supprimer
+        if ($filesystem->has($file->location)) {
+            $filesystem->delete($file->location);
+        }
+        $file->delete();
+
+        $request->session()->flash('success', 'Le fichier a bien été supprimé');
+        return redirect()->back();
     }
 
     public function getHomeworks() {
@@ -110,12 +157,39 @@ class UserController extends Controller
         ]);
     }
 
-    public function downloadFile() {
+    public function downloadFile(Request $request, $id) {
         $user = Auth::user();
-        if ($user->isAdmin() || $user->isTeacher()) {
-            
+        $file = Homework::find($id);
+
+        if ($user->isAdmin() || $user->isTeacher() || $file->student_id == $user->id) {
+            $adapter = new SftpAdapter([
+                'host' => '172.27.1.36',
+                'port' => 22,
+                'username' => 'serviej',
+                'password' => 'BelGoss77',
+                'timeout' => 10,
+                'directoryPerm' => 0755
+            ]);
+            $filesystem = new Filesystem($adapter);
+
+            // Vérification de l'existence du fichier
+            if (!$filesystem->has($file->location)) {
+                $request->session()->flash('danger', 'Le fichier n\'existe pas sur le serveur');
+                return redirect()->back();
+            }
+
+            // Lecture du fichier et téléchargement
+            $stream = $filesystem->readStream($file->location);
+            return response()->stream(function() use($stream) {
+                fpassthru($stream);
+            }, 200, [
+                "Content-Type" => $filesystem->getMimetype($file->location),
+                "Content-Length" => $filesystem->getSize($file->location),
+                "Content-disposition" => "attachment; filename=\"" . basename($file->location) . "\"",
+            ]);
         } else {
-            $request->session()->flash('status', 'Vous n\'avez pas accès à ce menu');
+            $request->session()->flash('danger', 'Vous n\'avez pas accès à ce menu');
+            return redirect()->back();
         }
     }
 }

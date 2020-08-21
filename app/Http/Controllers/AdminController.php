@@ -38,8 +38,9 @@ class AdminController extends Controller
             $isAdmin = $request->input('is_admin');
             $isTeacher = $request->input('is_teacher');
             $date_password = str_replace('/', '', $birth_date);
-            $date_naissance = \DateTime::createFromFormat('d/m/Y', $birth_date);
-            dd(isset($isAdmin));
+            $date_password = str_replace('-', '', $date_password);
+            //$date_naissance = \DateTime::createFromFormat('d/m/Y', $birth_date);
+            $date_naissance = $birth_date;
             $errors = 0;
 
             if (empty($last_name)) {
@@ -164,6 +165,12 @@ class AdminController extends Controller
         }
 
         return view('admin.mass_create');
+    }
+
+    public function getUsers() {
+        return view('admin.users', [
+            'users' => User::all()
+        ]);
     }
 
     public function userExists($email) {

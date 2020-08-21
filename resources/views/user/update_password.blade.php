@@ -5,7 +5,13 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Créer un compte') }}</div>
+                <div class="card-header">
+                    @if ($own_pwd)
+                    {{ __('Modification du mot de passe') }}
+                    @else
+                    {{ __('Modification du mot de passe pour ' . $user_n) }}
+                    @endif
+                </div>
 
                 <div class="card-body">
                     <form method="post" action="{{ route('update_password') }}">

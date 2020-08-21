@@ -12,32 +12,42 @@
                         <thead>
                             <tr>
                                 <th>Nom</th>
-                                <th>Date</th>
-                                <th>Correction</th>
-                                <th>Date correction</th>
+                                <th>Prénom</th>
+                                <th>Date de naissance</th>
+                                <th>E-mail</th>
+                                <th>Professeur</th>
+                                <th>Administrateur</th>
+                                @if (Auth::user()->isAdmin())
                                 <th>Actions</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($homeworks as $h)
+                            @foreach ($users as $u)
                             <tr>
-                                <td>{{ $h->filename }}</td>
-                                <td>{{ $h->created_at }}</td>
+                                <td>{{ $u->last_name }}</td>
+                                <td>{{ $u->first_name }}</td>
+                                <td>{{ $u->birth_date }}</td>
+                                <td>{{ $u->email }}</td>
                                 <td>
-                                    @if ($h->corrected == 0)
+                                    @if ($u->is_teacher == 0)
                                     <i style="color: red" class="fa fa-times"></i>
                                     @else
                                     <i style="color: green" class="fa fa-check"></i>
                                     @endif
                                 </td>
-                                <td>{{ $h->corrected == 0 ? '/' : $h->updated_at }}</td>
                                 <td>
-                                    <a title="Télécharger le devoir" class="btn btn-success" href="{{ route('download_file', ['id' => $h->id]) }}"><i class="fa fa-download"></i></a>
-                                    <a title="Supprimer le devoir" class="btn btn-danger confirm_delete" href="{{ route('delete_file', ['id' => $h->id]) }}"><i class="fa fa-trash"></i></a>
-                                    @if (Auth::user()->isAdmin() || Auth::user()->isTeacher())
-                                    <a title="Charger la devoir corrigé" class="btn btn-primary"><i class="fa fa-upload"></i></a>
+                                    @if ($u->is_admin == 0)
+                                    <i style="color: red" class="fa fa-times"></i>
+                                    @else
+                                    <i style="color: green" class="fa fa-check"></i>
                                     @endif
                                 </td>
+                                @if (Auth::user()->isAdmin())
+                                <td>
+                                    <a title="Modifier le mot de passe" class="btn btn-primary" href="{{ route('update_password', ['id' => $u->id]) }}"><i class="fa fa-pen"></i></a>
+                                </td>
+                                @endif
                             </tr>
                             @endforeach
                         </tbody>

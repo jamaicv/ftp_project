@@ -6,3 +6,20 @@
 
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
+
+.dataTables_wrapper .custom-select {
+    width: 60%;
+}
+
+.dataTables_wrapper label {
+    display: inline;
+}
+
+.dataTables_wrapper .form-control {
+    display: inline;
+    width: 60%;
+}
+
+.dataTables_wrapper .dataTables_length {
+    margin-bottom: 30px;
+}
