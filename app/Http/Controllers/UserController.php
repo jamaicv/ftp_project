@@ -51,9 +51,11 @@ class UserController extends Controller
             $new_pwd = $request->input('new_password');
             $new_pwd_confirm = $request->input('new_password_confirm');
 
-            if (!$user->password == Hash::make($old_pwd)) {
-                $request->session()->flash('danger', 'Ancien mot de passe incorrect');
-                return redirect()->back();
+            if (!$user->isAdmin() && $own_pwd) {
+                if (!$user->password == Hash::make($old_pwd)) {
+                    $request->session()->flash('danger', 'Ancien mot de passe incorrect');
+                    return redirect()->back();
+                }
             }
 
             if ($new_pwd != $new_pwd_confirm) {
@@ -210,7 +212,7 @@ class UserController extends Controller
             }, 200, [
                 "Content-Type" => $filesystem->getMimetype($file->location),
                 "Content-Length" => $filesystem->getSize($file->location),
-                "Content-disposition" => "attachment; filename=\"" . basename($file->location) . "\"",
+                "Content-disposition" => "attachment; filename=\"" . basename($file->filename) . "\"",
             ]);
         } else {
             $request->session()->flash('danger', 'Vous n\'avez pas accès à ce menu');

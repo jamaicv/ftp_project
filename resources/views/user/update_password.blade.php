@@ -16,10 +16,12 @@
                 <div class="card-body">
                     <form method="post" action="{{ route('update_password') }}">
                     @csrf
+                        @if (!Auth::user()->isAdmin() && $own_pwd)
                         <div class="form-group">
                             <label for="old_password">Ancien mot de passe</label>
                             <input name="old_password" type="password" class="form-control" id="old_password">
                         </div>
+                        @endif
                         <div class="form-group">
                             <label for="new_password">Nouveau mot de passe</label>
                             <input name="new_password" type="password" class="form-control" id="new_password">
