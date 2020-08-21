@@ -33,47 +33,48 @@
                                 <td>{{ $h->corrected == 0 ? '/' : $h->updated_at }}</td>
                                 <td>
                                     <a title="Télécharger le devoir" class="btn btn-success" href="{{ route('download_file', ['id' => $h->id]) }}"><i class="fa fa-download"></i></a>
-                                    <a title="Supprimer le devoir" class="btn btn-danger confirm_delete" href="{{ route('delete_file', ['id' => $h->id]) }}"><i class="fa fa-trash"></i></a>
+                                    <a title="Supprimer le devoir" class="btn btn-danger confirm_delete" data-toggle="modal" data-target="#confirm-submit"><i class="fa fa-trash"></i></a>
                                     @if (Auth::user()->isAdmin() || Auth::user()->isTeacher())
                                     <a title="Charger la devoir corrigé" class="btn btn-primary"><i class="fa fa-upload"></i></a>
                                     @endif
                                 </td>
                             </tr>
+
+                            <!-- SFTP Credentials modal -->
+                            <div class="modal fade" id="confirm-submit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            Connexion SFTP
+                                        </div>
+                                        <form id="delForm" action="{{ route('delete_file', ['id' => $h->id]) }}" method="post">
+                                        @csrf
+                                            <div class="modal-body">
+                                                <table>
+                                                    <tr>
+                                                        <td><label for="login">Identifiant</label></td>
+                                                        <td><input type="text" name="login" id="login"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><label for="password">Mot de passe</label></td>
+                                                        <td><input type="password" name="password" id="password"/></td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+                                                <a href="#" id="submit" class="btn btn-success success">Valider</a>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- SFTP Credentials modal -->
-<div class="modal fade" id="confirm-submit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                Connexion SFTP
-            </div>
-            <form action="{{ route('delete_file', ['id' => $h->id]) }}" method="post">
-                <div class="modal-body">
-                    <table>
-                        <tr>
-                            <td><label for="login">Identifiant</label></td>
-                            <td><input type="text" name="login" id="login"/></td>
-                        </tr>
-                        <tr>
-                            <td><label for="password">Mot de passe</label></td>
-                            <td><input type="password" name="password" id="password"/></td>
-                        </tr>
-                    </table>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-                    <a href="#" id="submit" class="btn btn-success success">Valider</a>
-                </div>
-            </form>
         </div>
     </div>
 </div>
@@ -97,9 +98,7 @@
         }
 
         $('#submit').click(function() {
-            $('#loginF').val($('#login').val());
-            $('#passwordF').val($('#password').val())
-            $('#upForm').submit();
+            $('#delForm').submit();
         });
     });
 </script>

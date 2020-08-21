@@ -30,4 +30,4 @@ Route::match(['get', 'post'], 'update-password/{id?}', 'UserController@updatePas
 Route::match(['get', 'post'], 'load-homework', 'UserController@loadFile')->name('load_homework');
 Route::match(['get', 'post'], 'homeworks', 'UserController@getHomeworks')->name('get_homeworks');
 Route::match(['get', 'post'], 'download-file/{id}', 'UserController@downloadFile')->name('download_file');
-Route::match(['get', 'post'], 'delete-file/{id}', 'UserController@deleteFile')->name('delete_file');
+Route::post('delete-file/{id}', 'UserController@deleteFile')->name('delete_file');
