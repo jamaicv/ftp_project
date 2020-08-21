@@ -36,7 +36,7 @@ class UserController extends Controller
     public function updatePassword(Request $request, $id = null) {
         $user = Auth::user();
         $own_pwd = true;
-        if (!$user->isAdmin() && $id != $user->id) {
+        if (!$user->isAdmin() && $id != $user->id && $id != null) {
             $request->session()->flash('danger', 'Vous n \'êtes pas autorisé à réaliser cette action');
             return redirect()->back();
         }
@@ -77,31 +77,37 @@ class UserController extends Controller
     public function loadFile(Request $request) {
         $user = Auth::user();
         if ($request->isMethod('post')) { 
+            $login = $request->input('login');
+            $password = $request->input('password');
+
             $file = $request->file('file');
             $filename = $file->getClientOriginalName();
-            $nom_devoir = 'test';
-            $ext = explode('.', $filename)[1];
-
-            $new_filename = strtolower($user->first_name . '_' .$user->last_name . '_' . $nom_devoir . '_' . date('U'));
-
+            $new_filename = $file->hashName();
+            $ext = $file->extension();
+   
             $adapter = new SftpAdapter([
                 'host' => '172.27.1.36',
                 'port' => 22,
-                'username' => 'serviej',
-                'password' => 'BelGoss77',
+                'username' => $login,
+                'password' => $password,
                 'timeout' => 10,
                 'directoryPerm' => 0755
             ]);
-            $resource = fopen($file->path(), 'r');
             $filesystem = new Filesystem($adapter);
-            $filesystem->put($filename, $resource);
+            $resource = fopen($file->path(), 'r');
+
+            try {
+                $filesystem = new Filesystem($adapter);
+                $filesystem->put($new_filename, $resource);
+            } catch (\Exception $e) {
+                $request->session()->flash('danger', 'Connexion au serveur impossible. Vérifiez vos identifiants ou contactez l\'administrateur');
+                return redirect()->back();
+            }
 
             ## TODO - VERIFICATIONS
-            $path = $file->store('public/homeworks');
-
             $hw = new Homework();
             $hw->filename = $filename;
-            $hw->location = $filename;
+            $hw->location = $new_filename;
             $hw->correction_location = '';
             $hw->student_id = $user->id;
             $hw->save();
@@ -117,29 +123,38 @@ class UserController extends Controller
         $user = Auth::user();
         $file = Homework::find($id);
 
-        if (!$user->isAdmin() && $user->id != $file->student_id) {
-            $request->session()->flash('danger', 'Vous n \'êtes pas autorisé à réaliser cette action');
+        if ($request->isMethod('post')) {
+            $login = $request->input('login');
+            $password = $request->input('password');
+            if (!$user->isAdmin() && $user->id != $file->student_id) {
+                $request->session()->flash('danger', 'Vous n \'êtes pas autorisé à réaliser cette action');
+                return redirect()->back();
+            }
+            
+            $adapter = new SftpAdapter([
+                'host' => '172.27.1.36',
+                'port' => 22,
+                'username' => $login,
+                'password' => $password,
+                'timeout' => 10,
+                'directoryPerm' => 0755
+            ]);
+            $filesystem = new Filesystem($adapter);
+
+            // Si le fichier existe, on le supprimer
+            try {
+                if ($filesystem->has($file->location)) {
+                    $filesystem->delete($file->location);
+                }
+            } catch (\Exception $e) {
+                $request->session()->flash('danger', 'Connexion au serveur impossible. Vérifiez vos identifiants ou contactez l\'administrateur');
+                return redirect()->back();
+            }
+            $file->delete();
+
+            $request->session()->flash('success', 'Le fichier a bien été supprimé');
             return redirect()->back();
         }
-
-        $adapter = new SftpAdapter([
-            'host' => '172.27.1.36',
-            'port' => 22,
-            'username' => 'serviej',
-            'password' => 'BelGoss77',
-            'timeout' => 10,
-            'directoryPerm' => 0755
-        ]);
-        $filesystem = new Filesystem($adapter);
-
-        // Si le fichier existe, on le supprimer
-        if ($filesystem->has($file->location)) {
-            $filesystem->delete($file->location);
-        }
-        $file->delete();
-
-        $request->session()->flash('success', 'Le fichier a bien été supprimé');
-        return redirect()->back();
     }
 
     public function getHomeworks() {
@@ -162,19 +177,29 @@ class UserController extends Controller
         $file = Homework::find($id);
 
         if ($user->isAdmin() || $user->isTeacher() || $file->student_id == $user->id) {
-            $adapter = new SftpAdapter([
-                'host' => '172.27.1.36',
-                'port' => 22,
-                'username' => 'serviej',
-                'password' => 'BelGoss77',
-                'timeout' => 10,
-                'directoryPerm' => 0755
-            ]);
-            $filesystem = new Filesystem($adapter);
+            try {
+                $adapter = new SftpAdapter([
+                    'host' => '172.27.1.36',
+                    'port' => 22,
+                    'username' => 'serviej',
+                    'password' => 'BelGoss77',
+                    'timeout' => 10,
+                    'directoryPerm' => 0755
+                ]);
+                $filesystem = new Filesystem($adapter);
+            } catch (\Exception $e) {
+                $request->session()->flash('danger', 'Connexion au serveur impossible. Vérifiez vos identifiants ou contactez l\'administrateur');
+                return redirect()->back();
+            }
 
             // Vérification de l'existence du fichier
-            if (!$filesystem->has($file->location)) {
-                $request->session()->flash('danger', 'Le fichier n\'existe pas sur le serveur');
+            try {
+                if (!$filesystem->has($file->location)) {
+                    $request->session()->flash('danger', 'Le fichier n\'existe pas sur le serveur');
+                    return redirect()->back();
+                }
+            } catch (\Exception $e) {
+                $request->session()->flash('danger', 'Connexion au serveur impossible. Vérifiez vos identifiants ou contactez l\'administrateur');
                 return redirect()->back();
             }
 
