@@ -56,7 +56,7 @@
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-                                                <a href="#" id="submit-{{$h->id}}" onclick="$('#delForm{{$h->id}}').submit();" class="btn btn-success success">Valider</a>
+                                                <a href="#" id="submit-{{$h->id}}" onclick="$('#delForm-{{$h->id}}').submit();" class="btn btn-success success">Valider</a>
                                             </div>
                                         </form>
                                     </div>
@@ -69,7 +69,7 @@
                                         <div class="modal-header">
                                             Connexion SFTP
                                         </div>
-                                        <form id="downloadForm{{$h->id}}" action="{{ route('download_file', ['id' => $h->id]) }}" method="post">
+                                        <form id="downloadForm-{{$h->id}}" action="{{ route('download_file', ['id' => $h->id]) }}" method="post">
                                             @csrf
                                             <div class="modal-body">
                                                 <label for="login">Identifiant</label>
@@ -79,7 +79,7 @@
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-                                                <a href="#" id="submitDownload-{{$h->id}}" onclick="$('#downloadForm{{$h->id}}').submit();" class="btn btn-success success">Valider</a>
+                                                <a href="#" id="submitDownload-{{$h->id}}" onclick="$('#downloadForm-{{$h->id}}').submit();" class="btn btn-success success">Valider</a>
                                             </div>
                                         </form>
                                     </div>
