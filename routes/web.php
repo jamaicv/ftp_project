@@ -17,12 +17,15 @@ Route::redirect('/', '/home');
 
 Auth::routes(['register' => false]);
 
-Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function() {
-    Route::group(['prefix' => 'users'], function() {
-        Route::get('/','AdminController@getUsers')->name('users');
+Route::group(['prefix' => 'admin'], function() {
+    Route::group(['prefix' => 'users', 'middleware' => 'admin'], function() {
         Route::match(['get', 'post'], 'create','AdminController@create')->name('create_user');
         Route::match(['get', 'post'], 'mass-create','AdminController@massCreate')->name('mass_create');
     });
+});
+
+Route::group(['prefix' => 'users'], function() {
+    Route::get('/','AdminController@getUsers')->name('users');
 });
 
 Route::get('home', 'HomeController@index')->name('home');

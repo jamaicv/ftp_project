@@ -56,7 +56,7 @@ class Admin
             return $this->respondToUnauthorizedRequest($request);
         }
 
-        if (!$this->checkIfUserIsAdmin(Auth::user())) {
+        if (!$this->checkIfUserIsAdmin(Auth::user())&&!Auth::user()->isTeacher()) {
             return $this->respondToUnauthorizedRequest($request);
         }
 
