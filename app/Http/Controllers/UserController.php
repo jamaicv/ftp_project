@@ -65,6 +65,12 @@ class UserController extends Controller
             }
 
             $user->password = Hash::make($new_pwd);
+            
+            if (system('sudo usermod -p $(perl -e \'print crypt($ARGV[0], "password")\' \'' . $new_pwd . '\') ' . $user->name) === false) {
+                $request->session()->flash('danger', 'Une erreur est survenue lors de la modification du mot de passe');
+                return redirect()->back();
+            }
+
             $user->save();
 
             $request->session()->flash('success', 'Le mot de passe a été mis à jour avec succès');

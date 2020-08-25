@@ -34,12 +34,12 @@
                                 </td>
                                 <td>{{ $h->corrected == 0 ? '/' : $h->updated_at }}</td>
                                 <td>
-                                    <a title="Télécharger le devoir" class="btn btn-success" href="{{ route('download_file', ['id' => $h->id]) }}"><i class="fa fa-download"></i></a>
+                                    <a title="Télécharger le devoir" class="btn btn-success" data-toggle="modal" data-target="#confirm-submit"href="{{ route('download_file', ['id' => $h->id]) }}"><i class="fa fa-download"></i></a>
                                     <a title="Supprimer le devoir" class="btn btn-danger confirm_delete" data-toggle="modal" data-target="#confirm-submit"><i class="fa fa-trash"></i></a>
                                 </td>
                             </tr>
 
-                            <!-- SFTP Credentials modal -->
+                            <!-- SFTP Credentials modal delete -->
                             <div class="modal fade" id="confirm-submit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
@@ -48,6 +48,29 @@
                                         </div>
                                         <form id="delForm" action="{{ route('delete_file', ['id' => $h->id]) }}" method="post">
                                         @csrf
+                                            <div class="modal-body">
+                                                <label for="login">Identifiant</label>
+                                                <input type="text" name="login" id="login"/><br/>
+                                                <label for="password">Mot de passe</label>
+                                                <input type="password" name="password" id="password"/>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+                                                <a href="#" id="submit" class="btn btn-success success">Valider</a>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- SFTP Credentials modal download -->
+                            <div class="modal fade" id="confirm-submit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            Connexion SFTP
+                                        </div>
+                                        <form id="downloadForm" action="{{ route('download_file', ['id' => $h->id]) }}" method="post">
+                                            @csrf
                                             <div class="modal-body">
                                                 <label for="login">Identifiant</label>
                                                 <input type="text" name="login" id="login"/><br/>
