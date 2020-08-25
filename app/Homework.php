@@ -21,4 +21,9 @@ class Homework extends Model
     protected $fillable = [
         'filename', 'location', 'student_id', 'corrector_id', 'corrected'
     ];
+
+    public function student()
+    {
+        return $this->hasOne('App\User', 'id', 'student_id');
+    }
 }

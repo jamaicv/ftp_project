@@ -89,7 +89,7 @@ class UserController extends Controller
             $ext = $file->extension();
    
             $adapter = new SftpAdapter([
-                'host' => '172.27.1.36',
+                'host' => env('SFTP_HOST', 'localhost'),
                 'port' => 22,
                 'username' => $login,
                 'password' => $password,
@@ -110,7 +110,7 @@ class UserController extends Controller
             $hw = new Homework();
             $hw->filename = $filename;
             $hw->hashed_name = $new_filename;
-            $hw->location = '/home/' . $login . '/' . $new_filename;
+            $hw->location = $filename;
             $hw->correction_location = '';
             $hw->student_id = $user->id;
             $hw->save();
@@ -135,7 +135,7 @@ class UserController extends Controller
             }
             
             $adapter = new SftpAdapter([
-                'host' => '172.27.1.36',
+                'host' => env('SFTP_HOST', 'localhost'),
                 'port' => 22,
                 'username' => $login,
                 'password' => $password,
@@ -179,45 +179,50 @@ class UserController extends Controller
         $user = Auth::user();
         $file = Homework::find($id);
 
-        if ($user->isAdmin() || $user->isTeacher() || $file->student_id == $user->id) {
-            try {
-                $adapter = new SftpAdapter([
-                    'host' => '172.27.1.36',
-                    'port' => 22,
-                    'username' => 'serviej',
-                    'password' => 'BelGoss77',
-                    'timeout' => 10,
-                    'directoryPerm' => 0755
-                ]);
-                $filesystem = new Filesystem($adapter);
-            } catch (\Exception $e) {
-                $request->session()->flash('danger', 'Connexion au serveur impossible. Vérifiez vos identifiants ou contactez l\'administrateur');
-                return redirect()->back();
-            }
-
-            // Vérification de l'existence du fichier
-            try {
-                if (!$filesystem->has($file->location)) {
-                    $request->session()->flash('danger', 'Le fichier n\'existe pas sur le serveur');
+        if ($request->isMethod('post')) {
+            if ($user->isAdmin() || $user->isTeacher() || $file->student_id == $user->id) {
+                $login = $user->isAdmin() || $user->isTeacher() ? env('SFTP_USER', 'root') : $request->input('login');
+                $password = $user->isAdmin() || $user->isTeacher() ? env('SFTP_PASSWD', 'root') : $request->input('password');
+                $file_location = $user->isAdmin() || $user->isTeacher() ? '/home/' . $user->name . '/' . $file->location : $file->location;
+                try {
+                    $adapter = new SftpAdapter([
+                        'host' => env('SFTP_HOST', 'localhost'),
+                        'port' => 22,
+                        'username' => $login,
+                        'password' => $password,
+                        'timeout' => 10,
+                        'directoryPerm' => 0755
+                    ]);
+                    $filesystem = new Filesystem($adapter);
+                } catch (\Exception $e) {
+                    $request->session()->flash('danger', 'Connexion au serveur impossible. Vérifiez vos identifiants ou contactez l\'administrateur');
                     return redirect()->back();
                 }
-            } catch (\Exception $e) {
-                $request->session()->flash('danger', 'Connexion au serveur impossible. Vérifiez vos identifiants ou contactez l\'administrateur');
+
+                // Vérification de l'existence du fichier
+                try {
+                    if (!$filesystem->has($file_location)) {
+                        $request->session()->flash('danger', 'Le fichier n\'existe pas sur le serveur');
+                        return redirect()->back();
+                    }
+                } catch (\Exception $e) {
+                    $request->session()->flash('danger', 'Connexion au serveur impossible. Vérifiez vos identifiants ou contactez l\'administrateur');
+                    return redirect()->back();
+                }
+
+                // Lecture du fichier et téléchargement
+                $stream = $filesystem->readStream($file_location);
+                return response()->stream(function() use($stream) {
+                    fpassthru($stream);
+                }, 200, [
+                    "Content-Type" => $filesystem->getMimetype($file_location),
+                    "Content-Length" => $filesystem->getSize($ffile_location),
+                    "Content-disposition" => "attachment; filename=\"" . basename($file->filename) . "\"",
+                ]);
+            } else {
+                $request->session()->flash('danger', 'Vous n\'avez pas accès à ce menu');
                 return redirect()->back();
             }
-
-            // Lecture du fichier et téléchargement
-            $stream = $filesystem->readStream($file->location);
-            return response()->stream(function() use($stream) {
-                fpassthru($stream);
-            }, 200, [
-                "Content-Type" => $filesystem->getMimetype($file->location),
-                "Content-Length" => $filesystem->getSize($file->location),
-                "Content-disposition" => "attachment; filename=\"" . basename($file->filename) . "\"",
-            ]);
-        } else {
-            $request->session()->flash('danger', 'Vous n\'avez pas accès à ce menu');
-            return redirect()->back();
         }
     }
 }

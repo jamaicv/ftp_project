@@ -11,6 +11,7 @@
                     <table id="mainTable" class="table table-striped table-bordered">
                         <thead>
                             <tr>
+                                <th>Eleve</th>
                                 <th>Nom</th>
                                 <th>Date</th>
                                 <th>Correction</th>
@@ -21,6 +22,7 @@
                         <tbody>
                             @foreach ($homeworks as $h)
                             <tr>
+                                <td>{{$h->student()->get()[0]->first_name . ' ' . $h->student()->get()[0]->last_name}}</td>
                                 <td>{{ $h->filename }}</td>
                                 <td>{{ $h->created_at }}</td>
                                 <td>

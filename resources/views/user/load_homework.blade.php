@@ -52,6 +52,34 @@
         </div>
     </div>
 </div>
+
+<!-- SFTP Credentials modal -->
+<div class="modal fade" id="confirm-submit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Connexion SFTP
+            </div>
+            <div class="modal-body">
+                <table>
+                    <tr>
+                        <td><label for="login">Identifiant</label></td>
+                        <td><input type="text" name="login" id="login"/></td>
+                    </tr>
+                    <tr>
+                        <td><label for="password">Mot de passe</label></td>
+                        <td><input type="password" name="password" id="password"/></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+                <a href="#" id="submit" class="btn btn-success success">Valider</a>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')

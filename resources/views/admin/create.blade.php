@@ -26,10 +26,6 @@
                             <label for="email">Adresse mail</label>
                             <input name="email" type="email" class="form-control" id="email">
                         </div>
-                        <div class="form-group">
-                            <label for="password">Mot de passe</label>
-                            <input name="password" type="password" class="form-control" id="password">
-                        </div>
                         <div class="form-group form-check">
                             <input name="is_admin" type="checkbox" class="form-check-input" id="is_admin">
                             <label class="form-check-label" for="is_admin">Administrateur</label>

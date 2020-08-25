@@ -77,11 +77,14 @@ class AdminController extends Controller
                 $user->email = $email;
                 $user->is_admin = $isAdmin != null ? true : false;
                 $user->is_teacher = $isTeacher != null ? true : false;
-                $user->save();
-                if (system('sudo useradd -m -p $(perl -e \'print crypt($ARGV[0], "password")\' \'' . $date_password . '\') ' . $user->name) == null) {
-                    $request->session()->flash('danger', 'Une erreur est survenue lors de la création du compte FTP.');
-                }
+
                 
+                if (system('sudo useradd -m -p $(perl -e \'print crypt($ARGV[0], "password")\' \'' . $date_password . '\') ' . $user->name) === false) {
+                    $request->session()->flash('danger', 'Une erreur est survenue lors de la création du compte FTP.');
+                    return redirect()->back();
+                }
+
+                $user->save();                
                 $request->session()->flash('success', 'Le compte a été créé avec succès.');
             }
         }
