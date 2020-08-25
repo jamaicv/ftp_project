@@ -106,7 +106,7 @@ class UserController extends Controller
 
             try {
                 $filesystem = new Filesystem($adapter);
-                $filesystem->put($new_filename, $resource);
+                $filesystem->put($filename, $resource);
             } catch (\Exception $e) {
                 $request->session()->flash('danger', 'Connexion au serveur impossible. Vérifiez vos identifiants ou contactez l\'administrateur');
                 return redirect()->back();
