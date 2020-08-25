@@ -190,20 +190,16 @@ class UserController extends Controller
                 $login = $user->isAdmin() || $user->isTeacher() ? env('SFTP_USER', 'root') : $request->input('login');
                 $password = $user->isAdmin() || $user->isTeacher() ? env('SFTP_PASSWD', 'root') : $request->input('password');
                 $file_location = $user->isAdmin() || $user->isTeacher() ? '/home/' . $user->name . '/' . $file->location : $file->location;
-                try {
-                    $adapter = new SftpAdapter([
-                        'host' => env('SFTP_HOST', 'localhost'),
-                        'port' => 22,
-                        'username' => $login,
-                        'password' => $password,
-                        'timeout' => 10,
-                        'directoryPerm' => 0755
-                    ]);
-                    $filesystem = new Filesystem($adapter);
-                } catch (\Exception $e) {
-                    $request->session()->flash('danger', 'Connexion au serveur impossible. Vérifiez vos identifiants ou contactez l\'administrateur');
-                    return redirect()->back();
-                }
+
+                $adapter = new SftpAdapter([
+                    'host' => env('SFTP_HOST', 'localhost'),
+                    'port' => 22,
+                    'username' => $login,
+                    'password' => $password,
+                    'timeout' => 10,
+                    'directoryPerm' => 0755
+                ]);
+                $filesystem = new Filesystem($adapter);
 
                 // Vérification de l'existence du fichier
                 try {
@@ -222,7 +218,7 @@ class UserController extends Controller
                     fpassthru($stream);
                 }, 200, [
                     "Content-Type" => $filesystem->getMimetype($file_location),
-                    "Content-Length" => $filesystem->getSize($ffile_location),
+                    "Content-Length" => $filesystem->getSize($file_location),
                     "Content-disposition" => "attachment; filename=\"" . basename($file->filename) . "\"",
                 ]);
             } else {
