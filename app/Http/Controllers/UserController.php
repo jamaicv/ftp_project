@@ -175,7 +175,7 @@ class UserController extends Controller
         } else {
             $homeworks = Homework::where('student_id', $user->id)->get();
         }
-
+        dd($homeworks);
         return view('user.homeworks', [
             'homeworks' => $homeworks
         ]);
