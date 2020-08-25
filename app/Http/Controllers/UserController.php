@@ -194,8 +194,8 @@ class UserController extends Controller
                 $adapter = new SftpAdapter([
                     'host' => env('SFTP_HOST', 'localhost'),
                     'port' => 22,
-                    'username' => 'servierj',
-                    'password' => 'mocaCheese19',
+                    'username' => $login,
+                    'password' => $password,
                     'timeout' => 10,
                     'directoryPerm' => 0755
                 ]);
