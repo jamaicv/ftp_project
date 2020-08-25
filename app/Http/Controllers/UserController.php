@@ -187,15 +187,15 @@ class UserController extends Controller
 
         if ($request->isMethod('post')) {
             if ($user->isAdmin() || $user->isTeacher() || $file->student_id == $user->id) {
-                $login = $user->isAdmin() || $user->isTeacher() ? env('SFTP_USER', 'root') : $request->input('login');
-                $password = $user->isAdmin() || $user->isTeacher() ? env('SFTP_PASSWD', 'root') : $request->input('password');
-                $file_location = $user->isAdmin() || $user->isTeacher() ? '/home/' . $user->name . '/' . $file->location : $file->location;
+                $login = $user->isAdmin() || $user->isTeacher() ? env('SFTP_USER', 'admin') : $request->input('login');
+                $password = $user->isAdmin() || $user->isTeacher() ? env('SFTP_PASSWD', 'admin') : $request->input('password');
+                $file_location = $user->isAdmin() || $user->isTeacher() ? '/home/' . $file->student()->get()[0]->name . '/' . $file->location : $file->location;
 
                 $adapter = new SftpAdapter([
                     'host' => env('SFTP_HOST', 'localhost'),
                     'port' => 22,
-                    'username' => $login,
-                    'password' => $password,
+                    'username' => 'servierj',
+                    'password' => 'mocaCheese19',
                     'timeout' => 10,
                     'directoryPerm' => 0755
                 ]);
@@ -208,6 +208,7 @@ class UserController extends Controller
                         return redirect()->back();
                     }
                 } catch (\Exception $e) {
+                    var_dump($e);die;
                     $request->session()->flash('danger', 'Connexion au serveur impossible. Vérifiez vos identifiants ou contactez l\'administrateur');
                     return redirect()->back();
                 }
