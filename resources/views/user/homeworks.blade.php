@@ -34,7 +34,7 @@
                                 </td>
                                 <td>{{ $h->corrected == 0 ? '/' : $h->updated_at }}</td>
                                 <td>
-                                    <a title="Télécharger le devoir" class="btn btn-success" data-toggle="modal" data-target="#confirm-submit"href="{{ route('download_file', ['id' => $h->id]) }}"><i class="fa fa-download"></i></a>
+                                    <a title="Télécharger le devoir" class="btn btn-success" data-toggle="modal" data-target="#confirm-submit"><i class="fa fa-download"></i></a>
                                     <a title="Supprimer le devoir" class="btn btn-danger confirm_delete" data-toggle="modal" data-target="#confirm-submit"><i class="fa fa-trash"></i></a>
                                 </td>
                             </tr>
@@ -79,7 +79,7 @@
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-                                                <a href="#" id="submit" class="btn btn-success success">Valider</a>
+                                                <a href="#" id="submitDownload" class="btn btn-success success">Valider</a>
                                             </div>
                                         </form>
                                     </div>
@@ -114,6 +114,9 @@
 
         $('#submit').click(function() {
             $('#delForm').submit();
+        });
+        $('#submitDownload').click(function() {
+            $('#downloadForm').submit();
         });
     });
 </script>
