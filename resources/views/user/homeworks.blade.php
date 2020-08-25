@@ -34,7 +34,7 @@
                                 </td>
                                 <td>{{ $h->corrected == 0 ? '/' : $h->updated_at }}</td>
                                 <td>
-                                    <a title="Télécharger le devoir" class="btn btn-success" data-toggle="modal" data-target="#confirm-submit"><i class="fa fa-download"></i></a>
+                                    <a title="Télécharger le devoir" class="btn btn-success" data-toggle="modal" data-target="#confirm-submit-dl"><i class="fa fa-download"></i></a>
                                     <a title="Supprimer le devoir" class="btn btn-danger confirm_delete" data-toggle="modal" data-target="#confirm-submit"><i class="fa fa-trash"></i></a>
                                 </td>
                             </tr>
@@ -63,7 +63,7 @@
                                 </div>
                             </div>
                             <!-- SFTP Credentials modal download -->
-                            <div class="modal fade" id="confirm-submit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal fade" id="confirm-submit-dl" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header">
