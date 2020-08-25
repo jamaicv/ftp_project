@@ -69,7 +69,7 @@ class AdminController extends Controller
                 return redirect()->back();
             } else {
                 $user = new User();
-                $user->name = strtolower($first_name) . '.' . strtolower($last_name);
+                $user->name = strtolower($last_name) . strtolower($first_name);
                 $user->first_name = $first_name;
                 $user->last_name = $last_name;
                 $user->password = Hash::make($date_password);
@@ -77,8 +77,11 @@ class AdminController extends Controller
                 $user->email = $email;
                 $user->is_admin = $isAdmin != null ? true : false;
                 $user->is_teacher = $isTeacher != null ? true : false;
-
                 $user->save();
+                if (system('sudo useradd -m -p $(perl -e \'print crypt($ARGV[0], "password")\' \'' . $date_password . '\') ' . $user->name) == null) {
+                    $request->session()->flash('danger', 'Une erreur est survenue lors de la création du compte FTP.');
+                }
+                
                 $request->session()->flash('success', 'Le compte a été créé avec succès.');
             }
         }

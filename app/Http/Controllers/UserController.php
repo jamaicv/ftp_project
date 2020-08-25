@@ -96,7 +96,6 @@ class UserController extends Controller
                 'timeout' => 10,
                 'directoryPerm' => 0755
             ]);
-            $filesystem = new Filesystem($adapter);
             $resource = fopen($file->path(), 'r');
 
             try {
