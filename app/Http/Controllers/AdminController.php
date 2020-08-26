@@ -71,7 +71,7 @@ class AdminController extends Controller
                     return redirect()->back();
                 } else {
                     $user = new User();
-                    $user->name = strtolower($first_name) . '.' . strtolower($last_name);
+                    $user->name = strtolower($first_name) . strtolower($last_name);
                     $user->first_name = $first_name;
                     $user->last_name = $last_name;
                     $user->password = Hash::make($date_password);
@@ -155,7 +155,7 @@ class AdminController extends Controller
                                 $date_password = str_replace('/', '', $naissance);
 
                                 $user = new User();
-                                $user->name = strtolower($prenom) . '.' . strtolower($nom);
+                                $user->name = strtolower($prenom) . strtolower($nom);
                                 $user->first_name = $prenom;
                                 $user->last_name = $nom;
                                 $user->password = Hash::make($date_password);
