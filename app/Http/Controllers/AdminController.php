@@ -80,8 +80,8 @@ class AdminController extends Controller
                     $user->is_admin = $isAdmin != null ? true : false;
                     $user->is_teacher = $isTeacher != null ? true : false;
 
-                    $res = system('sudo useradd -m -p $(perl -e \'print crypt($ARGV[0], "password")\' \'' . $date_password . '\') ' . $user->name);
-                    if ($res === false || $res != '') {
+                    
+                    if (system('sudo useradd -m -p $(perl -e \'print crypt($ARGV[0], "password")\' \'' . $date_password . '\') ' . $user->name) === false) {
                         $request->session()->flash('danger', 'Une erreur est survenue lors de la création du compte FTP.');
                         return redirect()->back();
                     }
@@ -164,9 +164,7 @@ class AdminController extends Controller
                                 $user->is_admin = $isAdmin == '' ? false : $isAdmin;
                                 $user->is_teacher = $isTeacher == '' ? false : $isTeacher;
 
-                                $res = system('sudo useradd -m -p $(perl -e \'print crypt($ARGV[0], "password")\' \'' . $date_password . '\') ' . $user->name);
-                                dd($res);
-                                if ($res === false || $res != '') {
+                                if (system('sudo useradd -m -p $(perl -e \'print crypt($ARGV[0], "password")\' \'' . $date_password . '\') ' . $user->name) === false) {
                                     $request->session()->flash('danger', 'Une erreur est survenue lors de la création du compte FTP.');
                                     return redirect()->back();
                                 }
