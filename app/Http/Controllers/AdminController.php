@@ -165,6 +165,7 @@ class AdminController extends Controller
                                 $user->is_teacher = $isTeacher == '' ? false : $isTeacher;
 
                                 $res = system('sudo useradd -m -p $(perl -e \'print crypt($ARGV[0], "password")\' \'' . $date_password . '\') ' . $user->name);
+                                dd($res);
                                 if ($res === false || $res != '') {
                                     $request->session()->flash('danger', 'Une erreur est survenue lors de la création du compte FTP.');
                                     return redirect()->back();
