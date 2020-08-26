@@ -71,7 +71,7 @@ class AdminController extends Controller
                     return redirect()->back();
                 } else {
                     $user = new User();
-                    $user->name = strtolower($last_name) . strtolower($first_name);
+                    $user->name = strtolower($first_name) . '.' . strtolower($last_name);
                     $user->first_name = $first_name;
                     $user->last_name = $last_name;
                     $user->password = Hash::make($date_password);
